@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Lecture_Edit" width="1280" height="720" titletext="New Form">
+    <Layouts>
+      <Layout height="720" mobileorientation="landscape" width="1280">
+        <Static id="Static00" taborder="0" text="강의명" left="130" top="178" width="88" height="32" onclick="Static00_onclick"/>
+        <Static id="Static00_00" taborder="1" text="교수명" left="130" top="220" width="88" height="32" onclick="Static00_onclick"/>
+        <Static id="Static00_00_00" taborder="2" text="학부" left="132" top="260" width="88" height="32" onclick="Static00_onclick"/>
+        <Edit id="edt_name" taborder="3" left="190" top="184" width="140" height="20" value="bind:ds_detail.name"/>
+        <Edit id="edt_professor" taborder="4" left="190" top="226" width="140" height="20" value="bind:ds_detail.professor"/>
+        <Edit id="edt_department" taborder="5" left="190" top="266" width="140" height="20" value="bind:ds_detail.department"/>
+        <Button id="btn_edit" taborder="6" text="저장" left="80" top="350" width="120" height="50" onclick="btn_edit_onclick"/>
+        <Button id="btn_close" taborder="7" text="취소" left="220" top="350" width="120" height="50" onclick="btn_close_onclick"/>
+        <Static id="Static00_01" taborder="8" text="강의번호" left="132" top="142" width="88" height="32" onclick="Static00_onclick"/>
+        <Edit id="edt_id" taborder="9" left="192" top="148" width="140" height="20" text="bind:ds_detail.name" readonly="true"/>
+      </Layout>
+    </Layouts>
+    <Objects>
+      <Dataset id="ds_detail">
+        <ColumnInfo>
+          <Column id="id" type="INT" size="256"/>
+          <Column id="name" type="STRING" size="256"/>
+          <Column id="professor" type="STRING" size="256"/>
+          <Column id="department" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+    <Script type="xscript5.1"><![CDATA[this.Lecture_Edit_onload = function(obj:Form, e:EventInfo)
+{
+/*	var id = this.parent.arguments ? this.parent.arguments.lectureId : null;
+*/
+//     var owner = this.getOwnerFrame();
+//     var oArgs = owner.arguments;
+
+    var oArgs = this.getOwnerFrame().arguments; // ✅ 반드시 이렇게 접근해야 함
+    trace("ownerFrame: " +  JSON.stringify(oArgs));  
+    trace("ownerFrame id: " + oArgs.lectureId);  
+    trace("ownerFrame.arguments 존재 여부: " + (oArgs ? "있음" : "없음"));
+
+    if (!oArgs || oArgs.lectureId == null) {
+        trace("❌ lectureId가 넘어오지 않았습니다.");
+        this.alert("잘못된 접근입니다. lectureId가 없습니다.");
+        return;
+    }
+
+    var lectureId = oArgs.lectureId; // ✅ 여기서 변수 선언해야 함
+
+    trace("✅ 받은 lectureId: " + lectureId);
+    this.alert("넘어온 lectureId: " + lectureId);
+
+    this.fnGetLectureDetail(lectureId);
+	
+};
+
+this.addEventHandler("onload", this.Lecture_Edit_onload, this);
+
+this.fnGetLectureDetail = function(id)
+{
+	    // Dataset 초기화
+    this.ds_detail.clearData();
+    var strSvcId = "getDetail";
+    var strSvcUrl = "svc::selectLectureDetail.do";
+    var inData = "";
+    var outData = "ds_detail=output1";
+    var strArg = "lectureId=" + id;
+    var callbackFnc = "fnCallback";
+
+    this.transaction(strSvcId, strSvcUrl, inData, outData, strArg, callbackFnc, true);
+};
+
+this.btn_save_onclick = function()
+{
+    var strSvcId = "updateLecture";
+    var strSvcUrl = "svc::updateLecture.do";
+    var inData = "input1=ds_detail";
+    var outData = "";
+    var strArg = "";
+    var callbackFnc = "fnCallback";
+
+    this.transaction(strSvcId, strSvcUrl, inData, outData, strArg, callbackFnc, true);
+};
+
+this.btn_close_onclick = function()
+{
+    this.close();
+};
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+    if (errorCode != 0) {
+        this.alert("오류 발생: " + errorMsg);
+        return;
+    }
+
+    if (svcID == "updateLecture") {
+        this.alert("수정 완료되었습니다.");
+        this.close();
+    }
+};
+]]></Script>
+  </Form>
+  <Events>
+    <Event id="onload" handler="Lecture_Edit_onload"/>
+  </Events>
+</FDL>

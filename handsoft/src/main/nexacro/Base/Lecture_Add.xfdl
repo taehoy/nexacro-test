@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Lecture_Add" width="1280" height="720" titletext="New Form">
+    <Layouts>
+      <Layout height="720" mobileorientation="landscape" width="1280" stepcount="0">
+        <Static id="Static00" taborder="0" text="강의명" left="130" top="178" width="88" height="32" onclick="Static00_onclick"/>
+        <Static id="Static00_00" taborder="1" text="교수명" left="130" top="220" width="88" height="32" onclick="Static00_onclick"/>
+        <Static id="Static00_00_00" taborder="2" text="학부" left="132" top="260" width="88" height="32" onclick="Static00_onclick"/>
+        <Edit id="edt_name" taborder="3" left="190" top="184" width="140" height="20" text="bind:ds_lecture.name"/>
+        <Edit id="edt_professor" taborder="4" left="190" top="226" width="140" height="20" text="bind:ds_lecture.professor"/>
+        <Edit id="edt_department" taborder="5" left="190" top="266" width="140" height="20" text="bind:ds_lecture.department"/>
+        <Button id="btn_add" taborder="6" text="저장" left="180" top="325" width="120" height="50" onclick="btn_add_onclick"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[this.btn_add_onclick = function(obj, e)
+{
+    this.fnInsertLecture();
+};
+
+this.fnInsertLecture = function()
+{
+/*    this.btn_add.setFocus(); // 포커스를 버튼으로 이동시켜 커밋 유도
+*/
+    // 👇 강제 값 대입
+    this.ds_lecture.setColumn(0, "name", this.edt_name.value);
+    this.ds_lecture.setColumn(0, "professor", this.edt_professor.value);
+    this.ds_lecture.setColumn(0, "department", this.edt_department.value);
+	
+	trace("이름: " + this.ds_lecture.getColumn(0, "name"));
+	trace("교수: " + this.ds_lecture.getColumn(0, "professor"));
+	trace("학부: " + this.ds_lecture.getColumn(0, "department"));
+	trace("Row count: " + this.ds_lecture.getRowCount());
+	trace("Row position: " + this.ds_lecture.rowposition);
+	trace("name 존재 여부: " + this.ds_lecture.getColumnInfo("name"));
+	
+    var strSvcId    = "insertLecture";
+    var strSvcUrl   = "svc::insertLecture.do";
+    var inData      = "input1=ds_lecture";
+    var outData     = "";
+    var strArg      = "";
+    var callBackFnc = "fnCallback";
+    var isAsync     = true;
+
+    this.transaction(strSvcId, strSvcUrl, inData, outData, strArg, callBackFnc, isAsync);
+};
+
+this.Lecture_Add_onload = function(obj, e)
+{
+    if (this.ds_lecture.getRowCount() == 0) {
+        this.ds_lecture.addRow();
+    }
+
+    this.ds_lecture.set_rowposition(0);
+};
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+    if (errorCode != 0) {
+        this.alert("에러 발생: " + errorMsg);
+        return;
+    }
+
+    if (svcID == "insertLecture") {
+        this.alert("강의가 성공적으로 등록되었습니다.");
+		
+        this.close("REFRESH_LIST"); // 등록 후 화면 닫기 등 원하는 처리
+    }
+};]]></Script>
+    <Objects>
+      <Dataset id="ds_lecture">
+        <ColumnInfo>
+          <Column id="name" type="STRING" size="256"/>
+          <Column id="professor" type="STRING" size="256"/>
+          <Column id="department" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+    </Objects>
+  </Form>
+</FDL>

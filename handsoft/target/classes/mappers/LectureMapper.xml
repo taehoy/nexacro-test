@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.handsoft.sample.mapper.LectureMapper">
+	
+	<resultMap id="lectureResultMap" type="Lecture">
+	    <id property="id" column="id"/>
+	    <result property="name" column="name"/>
+	    <result property="professor" column="professor"/>
+	    <result property="department" column="department"/>
+	    <result property="createAt" column="create_at"/>
+	    <result property="deleted" column="deleted"/>
+	</resultMap>
+
+
+	<select id="findAll"
+		resultMap="lectureResultMap">
+		SELECT id, name, professor, department, created_at, deleted
+		FROM LECTURE
+		WHERE deleted = 0
+		ORDER BY id
+	</select>
+
+
+	<insert id="insert" parameterType="Lecture">
+		INSERT INTO LECTURE (name, professor, department)
+		VALUES (#{name}, #{professor}, #{department})
+	</insert>
+
+	<update id="update" parameterType="Lecture">
+		UPDATE LECTURE
+		SET name = #{name},
+		professor = #{professor},
+		department = #{department}
+		WHERE id = #{id}
+	</update>
+
+	<!-- SOFT DELETE -->
+	<update id="delete" parameterType="long">
+		UPDATE LECTURE
+		SET deleted = 1
+		WHERE id = #{id}
+	</update>
+</mapper>
